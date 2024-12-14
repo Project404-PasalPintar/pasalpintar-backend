@@ -8,7 +8,7 @@ import {
   deleteTutorProfile,
   getAllTutors,
 } from "../../controllers/lawyers/lawyerController";
-import {verifyAccessToken} from "../../middleware/lawyers/authMiddleware"; // Middleware for JWT auth
+import {verifyAccessToken} from "../../middleware/sessions/authMiddleware"; // Middleware for JWT auth
 
 const router = Router();
 
