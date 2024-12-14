@@ -73,12 +73,41 @@ export const getAllCommunityPosts = async (
       return;
     }
 
-    const posts = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate().toISOString() || null,
-      updatedAt: doc.data().updatedAt?.toDate().toISOString() || null,
-    }));
+    const posts = await Promise.all(
+      snapshot.docs.map(async (doc) => {
+        const postData = doc.data();
+        const {creatorID} = postData;
+
+        // Fetch creator's firstname
+        let firstname = null;
+        if (creatorID) {
+          const userRef = admin
+            .firestore()
+            .collection("testing")
+            .doc("data")
+            .collection("users")
+            .doc(creatorID);
+          const userSnapshot = await userRef.get();
+          if (userSnapshot.exists) {
+            firstname = userSnapshot.data()?.firstname || null;
+          }
+        }
+
+        // Count the total number of comments for the post
+        const commentsRef = postsRef.doc(doc.id).collection("comments");
+        const commentsSnapshot = await commentsRef.get();
+        const totalComments = commentsSnapshot.size;
+
+        return {
+          id: doc.id,
+          ...postData,
+          createdAt: postData.createdAt?.toDate().toISOString() || null,
+          updatedAt: postData.updatedAt?.toDate().toISOString() || null,
+          firstname,
+          totalComments,
+        };
+      })
+    );
 
     res.status(200).json({
       status: "success",
