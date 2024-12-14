@@ -27,7 +27,6 @@ if (!AGORA_APP_ID || !AGORA_APP_CERTIFICATE) {
 export const startSession = async (req: Request, res: Response) => {
   const studentID = (req.user as { userID: string }).userID;
   const lawyerID = req.body.lawyerID;
-  const fileUrls = req.body.fileUrls || [];
 
   if (!lawyerID) {
     return res.status(400).json({
@@ -37,11 +36,6 @@ export const startSession = async (req: Request, res: Response) => {
   }
 
   const question = req.body.question || "";
-  const studentCountry = req.body.studentCountry || "";
-  const languages = req.body.languages || "";
-  const subjects = req.body.subjects || "";
-  const topics = req.body.topics || [];
-  const age = req.body.age || 0;
 
   try {
     const lawyerDoc = await admin
@@ -92,13 +86,7 @@ export const startSession = async (req: Request, res: Response) => {
       channelName,
       startTime: null,
       status: "Pending",
-      fileUrls: [],
       question,
-      studentCountry,
-      languages,
-      subjects,
-      topics,
-      age,
       costs: 0,
       isSolved: false,
       sessionEarning: 0,
@@ -153,7 +141,6 @@ export const startSession = async (req: Request, res: Response) => {
 
     const formattedSessionData = {
       ...savedSessionData,
-      fileUrls,
       createdAt: savedSessionData.createdAt.toDate().toISOString(),
       updatedAt: savedSessionData.updatedAt.toDate().toISOString(),
       user: {
