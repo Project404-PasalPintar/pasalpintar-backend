@@ -61,7 +61,7 @@ export const saveProfilePicUrl = async (req: Request, res: Response) => {
 
   try {
     // Construct the full URL for the profile picture
-    const profilePicUrl = `https://storage.googleapis.com/studyotutorapp.appspot.com/lawyers/${userID}/${fileName}`;
+    const profilePicUrl = `https://storage.googleapis.com/studyotutorapp.appspot.com/testing/${userID}/${fileName}`;
 
     // Make file public
     await makeFilePublic(`testing/${userID}/${fileName}`);
