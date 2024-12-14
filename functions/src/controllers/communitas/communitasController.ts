@@ -79,7 +79,7 @@ export const getAllCommunityPosts = async (
         const {creatorID} = postData;
 
         // Fetch creator's firstname
-        let firstname = null;
+        let firstName = null;
         if (creatorID) {
           const userRef = admin
             .firestore()
@@ -89,7 +89,7 @@ export const getAllCommunityPosts = async (
             .doc(creatorID);
           const userSnapshot = await userRef.get();
           if (userSnapshot.exists) {
-            firstname = userSnapshot.data()?.firstname || null;
+            firstName = userSnapshot.data()?.firstName || null;
           }
         }
 
@@ -103,7 +103,7 @@ export const getAllCommunityPosts = async (
           ...postData,
           createdAt: postData.createdAt?.toDate().toISOString() || null,
           updatedAt: postData.updatedAt?.toDate().toISOString() || null,
-          firstname,
+          firstName,
           totalComments,
         };
       })
@@ -191,17 +191,52 @@ export const getCommentsByPost = async (
       return;
     }
 
-    const commentsRef = admin
+    // Reference to the post document
+    const postRef = admin
       .firestore()
       .collection("testing")
       .doc("chat")
       .collection("communitas")
-      .doc(postID)
-      .collection("comments");
+      .doc(postID);
 
-    const snapshot = await commentsRef.orderBy("createdAt", "asc").get();
+    const postSnapshot = await postRef.get();
 
-    if (snapshot.empty) {
+    if (!postSnapshot.exists) {
+      res.status(404).json({
+        status: "fail",
+        message: "Post not found.",
+      });
+      return;
+    }
+
+    const postData = postSnapshot.data();
+    const {creatorID, title, question} = postData || {};
+
+    // Fetch the creator's firstname
+    let firstName = null;
+    if (creatorID) {
+      const userRef = admin
+        .firestore()
+        .collection("testing")
+        .doc("data")
+        .collection("users")
+        .doc(creatorID);
+
+      const userSnapshot = await userRef.get();
+      if (userSnapshot.exists) {
+        firstName = userSnapshot.data()?.firstName || null;
+      }
+    }
+
+    // Fetch comments
+    const commentsRef = postRef.collection("comments");
+    const commentsSnapshot = await commentsRef
+      .orderBy("createdAt", "asc")
+      .get();
+
+    const totalComments = commentsSnapshot.size; // Total number of comments
+
+    if (commentsSnapshot.empty) {
       res.status(404).json({
         status: "fail",
         message: "No comments found for this post.",
@@ -209,8 +244,9 @@ export const getCommentsByPost = async (
       return;
     }
 
+    // Map comments with user details
     const comments = await Promise.all(
-      snapshot.docs.map(async (doc) => {
+      commentsSnapshot.docs.map(async (doc) => {
         const commentData = doc.data();
         const {commenterID} = commentData;
 
@@ -240,10 +276,21 @@ export const getCommentsByPost = async (
       })
     );
 
+    // Respond with post details and comments
     res.status(200).json({
       status: "success",
       message: "Comments fetched successfully.",
-      data: comments,
+      data: {
+        post: {
+          id: postID,
+          title,
+          question,
+          creatorID,
+          firstName,
+          totalComments,
+        },
+        comments,
+      },
     });
   } catch (error) {
     console.error("Error fetching comments:", error);
