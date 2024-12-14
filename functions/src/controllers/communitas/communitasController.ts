@@ -236,14 +236,6 @@ export const getCommentsByPost = async (
 
     const totalComments = commentsSnapshot.size; // Total number of comments
 
-    if (commentsSnapshot.empty) {
-      res.status(404).json({
-        status: "fail",
-        message: "No comments found for this post.",
-      });
-      return;
-    }
-
     // Map comments with user details
     const comments = await Promise.all(
       commentsSnapshot.docs.map(async (doc) => {
@@ -276,7 +268,7 @@ export const getCommentsByPost = async (
       })
     );
 
-    // Respond with post details and comments
+    // Respond with post details and comments (handle empty comments case)
     res.status(200).json({
       status: "success",
       message: "Comments fetched successfully.",
@@ -289,7 +281,7 @@ export const getCommentsByPost = async (
           firstName,
           totalComments,
         },
-        comments,
+        comments: comments.length > 0 ? comments : [], // Return empty array if no comments
       },
     });
   } catch (error) {
