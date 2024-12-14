@@ -238,3 +238,52 @@ export const deleteTutorProfile = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getLawyerProfileById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const {lawyerId} = req.params;
+
+    if (!lawyerId) {
+      res.status(400).json({
+        status: "fail",
+        message: "lawyerId is required.",
+      });
+      return;
+    }
+
+    const lawyerRef = admin
+      .firestore()
+      .collection("testing")
+      .doc("data")
+      .collection("lawyers")
+      .doc(lawyerId);
+
+    const lawyerDoc = await lawyerRef.get();
+
+    if (!lawyerDoc.exists) {
+      res.status(404).json({
+        status: "fail",
+        message: `No lawyer found with ID: ${lawyerId}.`,
+      });
+      return;
+    }
+
+    const lawyerData = lawyerDoc.data();
+
+    res.status(200).json({
+      status: "success",
+      message: "Lawyer profile fetched successfully.",
+      data: {id: lawyerId, ...lawyerData},
+    });
+  } catch (error) {
+    console.error("Error fetching lawyer profile:", error);
+    res.status(500).json({
+      status: "fail",
+      message: "Failed to fetch lawyer profile.",
+      error: error instanceof Error ? error.message : "Unknown error.",
+    });
+  }
+};
