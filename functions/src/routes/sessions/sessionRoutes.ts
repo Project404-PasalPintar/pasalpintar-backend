@@ -14,7 +14,7 @@ import {
   leaveSession,
   rejoinSession,
 } from "../../controllers/sessions/meetingController";
-import {verifyAccessToken} from "../../middleware/sessions/authMiddleware";
+import {verifyAccessToken} from "../../middleware/users/authMiddleware";
 import {checkStudentBalance} from "../../middleware/sessions/checkBalanceMiddleware";
 import {getTutorSessionHistory} from "../../controllers/sessions/sessionHistoryController";
 import {getTutorStatistics} from "../../controllers/sessions/tutorStatisticsController";

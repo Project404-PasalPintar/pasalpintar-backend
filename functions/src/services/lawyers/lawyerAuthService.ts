@@ -74,8 +74,8 @@ export const signUpLawyer = async (newTutorData: lawyer, res: Response) => {
       refreshToken: null,
 
       profilePic: "",
-      balance: 0,
-      isOnline: false,
+      balance: 20,
+      isOnline: true,
       fcmToken: "",
     });
 

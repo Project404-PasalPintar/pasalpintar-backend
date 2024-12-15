@@ -6,7 +6,6 @@ import {
   updateTutorProfilePut,
   updateTutorProfilePatch,
   deleteTutorProfile,
-  getAllTutors,
 } from "../../controllers/lawyers/lawyerController";
 import {verifyAccessToken} from "../../middleware/lawyers/authMiddleware"; // Middleware for JWT auth
 
@@ -17,8 +16,6 @@ router.get("/", verifyAccessToken, getLawyerProfile); // Get lawyer profile
 router.put("/", verifyAccessToken, updateTutorProfilePut); // Full update of lawyer profile
 router.patch("/", verifyAccessToken, updateTutorProfilePatch); // Partial update of lawyer profile
 router.delete("/", verifyAccessToken, deleteTutorProfile); // Delete lawyer profile
-
-router.get("/all", verifyAccessToken, getAllTutors);
 
 export default router;
 /* eslint-enable new-cap */

@@ -73,12 +73,41 @@ export const getAllCommunityPosts = async (
       return;
     }
 
-    const posts = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate().toISOString() || null,
-      updatedAt: doc.data().updatedAt?.toDate().toISOString() || null,
-    }));
+    const posts = await Promise.all(
+      snapshot.docs.map(async (doc) => {
+        const postData = doc.data();
+        const {creatorID} = postData;
+
+        // Fetch creator's firstname
+        let firstName = null;
+        if (creatorID) {
+          const userRef = admin
+            .firestore()
+            .collection("testing")
+            .doc("data")
+            .collection("users")
+            .doc(creatorID);
+          const userSnapshot = await userRef.get();
+          if (userSnapshot.exists) {
+            firstName = userSnapshot.data()?.firstName || null;
+          }
+        }
+
+        // Count the total number of comments for the post
+        const commentsRef = postsRef.doc(doc.id).collection("comments");
+        const commentsSnapshot = await commentsRef.get();
+        const totalComments = commentsSnapshot.size;
+
+        return {
+          id: doc.id,
+          ...postData,
+          createdAt: postData.createdAt?.toDate().toISOString() || null,
+          updatedAt: postData.updatedAt?.toDate().toISOString() || null,
+          firstName,
+          totalComments,
+        };
+      })
+    );
 
     res.status(200).json({
       status: "success",
@@ -162,26 +191,54 @@ export const getCommentsByPost = async (
       return;
     }
 
-    const commentsRef = admin
+    // Reference to the post document
+    const postRef = admin
       .firestore()
       .collection("testing")
       .doc("chat")
       .collection("communitas")
-      .doc(postID)
-      .collection("comments");
+      .doc(postID);
 
-    const snapshot = await commentsRef.orderBy("createdAt", "asc").get();
+    const postSnapshot = await postRef.get();
 
-    if (snapshot.empty) {
+    if (!postSnapshot.exists) {
       res.status(404).json({
         status: "fail",
-        message: "No comments found for this post.",
+        message: "Post not found.",
       });
       return;
     }
 
+    const postData = postSnapshot.data();
+    const {creatorID, title, question} = postData || {};
+
+    // Fetch the creator's firstname
+    let firstName = null;
+    if (creatorID) {
+      const userRef = admin
+        .firestore()
+        .collection("testing")
+        .doc("data")
+        .collection("users")
+        .doc(creatorID);
+
+      const userSnapshot = await userRef.get();
+      if (userSnapshot.exists) {
+        firstName = userSnapshot.data()?.firstName || null;
+      }
+    }
+
+    // Fetch comments
+    const commentsRef = postRef.collection("comments");
+    const commentsSnapshot = await commentsRef
+      .orderBy("createdAt", "asc")
+      .get();
+
+    const totalComments = commentsSnapshot.size; // Total number of comments
+
+    // Map comments with user details
     const comments = await Promise.all(
-      snapshot.docs.map(async (doc) => {
+      commentsSnapshot.docs.map(async (doc) => {
         const commentData = doc.data();
         const {commenterID} = commentData;
 
@@ -211,10 +268,21 @@ export const getCommentsByPost = async (
       })
     );
 
+    // Respond with post details and comments (handle empty comments case)
     res.status(200).json({
       status: "success",
       message: "Comments fetched successfully.",
-      data: comments,
+      data: {
+        post: {
+          id: postID,
+          title,
+          question,
+          creatorID,
+          firstName,
+          totalComments,
+        },
+        comments: comments.length > 0 ? comments : [], // Return empty array if no comments
+      },
     });
   } catch (error) {
     console.error("Error fetching comments:", error);

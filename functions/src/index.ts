@@ -8,6 +8,7 @@ import userRoutes from "./routes/users/userRoutes";
 import profileRoutes from "./routes/users/uploadProfileRoutes";
 import usernameRoutes from "./routes/users/usernameRoutes";
 import passwordRoutes from "./routes/users/passwordRoutes";
+import getLawyer from "./routes/lawyers/getLawyer";
 
 // Session
 import sessionInfoRoutes from "./routes/sessions/sessionInfoRoutes";
@@ -30,6 +31,13 @@ import serviceAccount from "./utils/service-account-key.json";
 dotenv.config();
 
 const storageBucket = process.env.STORAGE_BUCKET;
+
+// Extend IncomingMessage to include userID
+declare module "http" {
+  interface IncomingMessage {
+    userID?: string;
+  }
+}
 
 // Initialize Firebase Admin SDK
 if (process.env.FUNCTIONS_EMULATOR === "true") {
@@ -54,6 +62,7 @@ app.use(cors({origin: true}));
 // ----------- lawyers ------------
 app.use("/v1/users/auth", authRoutes);
 app.use("/v1/users/profile", userRoutes);
+app.use("/v1/users/profile/lawyer", getLawyer);
 app.use("/v1/users/profile/file", profileRoutes);
 app.use("/v1/users/profile/username", usernameRoutes);
 app.use("/v1/users/profile/password", passwordRoutes);

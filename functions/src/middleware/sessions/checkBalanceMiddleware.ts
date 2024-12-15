@@ -7,7 +7,14 @@ export const checkStudentBalance = async (
   res: Response,
   next: NextFunction
 ) => {
-  const userID = (req.user as { id: string }).id;
+  const userID = (req.user as { userID: string }).userID;
+
+  if (!userID) {
+    return res.status(400).json({
+      status: "fail",
+      message: "Missing or invalid user ID.",
+    });
+  }
 
   try {
     const studentDocRef = admin
@@ -16,12 +23,13 @@ export const checkStudentBalance = async (
       .doc("data")
       .collection("users")
       .doc(userID);
+
     const userDoc = await studentDocRef.get();
 
     if (!userDoc.exists) {
       return res.status(404).json({
         status: "fail",
-        message: "user not found.",
+        message: "User not found.",
       });
     }
 
@@ -44,6 +52,7 @@ export const checkStudentBalance = async (
     return res.status(500).json({
       status: "fail",
       message: "Unable to check user balance.",
+      error: error instanceof Error ? error.message : "Unknown error.",
     });
   }
 };

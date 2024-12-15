@@ -75,8 +75,8 @@ export const signUpUser = async (newTutorData: user, res: Response) => {
       refreshToken: null,
 
       profilePic: "",
-      balance: 0,
-      isOnline: false,
+      balance: 100,
+      isOnline: true,
       fcmToken: "",
     });
 

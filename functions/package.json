@@ -21,13 +21,14 @@
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.21.0",
+    "express": "^4.21.2",
     "firebase-admin": "^12.5.0",
     "firebase-functions": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "mime-types": "^2.1.35",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^2.7.0",
+    "ws": "^8.18.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -35,6 +36,7 @@
     "@types/mime-types": "^2.1.4",
     "@types/multer": "^1.4.12",
     "@types/node-fetch": "^2.6.11",
+    "@types/ws": "^8.5.13",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
     "eslint": "^8.9.0",
