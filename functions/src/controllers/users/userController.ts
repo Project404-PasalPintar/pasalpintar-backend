@@ -50,6 +50,7 @@ export const getAllTutors = async (req: Request, res: Response) => {
 };
 
 // Get user data
+// Get user data
 export const getUserProfile = async (req: Request, res: Response) => {
   const userID = (req.user as { userID: string }).userID;
 
@@ -65,7 +66,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
     if (!userDoc.exists) {
       return res.status(404).json({
         status: "fail",
-        message: "user not found.",
+        message: "User not found.",
       });
     }
 
@@ -80,8 +81,9 @@ export const getUserProfile = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       status: "success",
-      message: "user profile retrieved successfully",
+      message: "User profile retrieved successfully.",
       data: {
+        userID, // Include the userID in the response
         ...userData,
         createdAt,
         updatedAt,
