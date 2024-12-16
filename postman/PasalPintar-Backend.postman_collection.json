@@ -1,0 +1,3330 @@
+{
+	"info": {
+		"_postman_id": "b3615674-756c-47da-8ffe-193de04bc46d",
+		"name": "PasalPintar-Backend",
+		"description": "baseUrl : [https://api-z77zvpmgsa-uc.a.run.app](https://api-z77zvpmgsa-uc.a.run.app)\n\nFCM Token : Token Firebase Cloud Messaging",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "28646220",
+		"_collection_link": "https://tutors-backend.postman.co/workspace/Team-Workspace~4a6d1c72-a79b-4af0-83c2-ae0b348e0f75/collection/28646220-b3615674-756c-47da-8ffe-193de04bc46d?action=share&source=collection_link&creator=28646220"
+	},
+	"item": [
+		{
+			"name": "Auth User",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"firstName\": \"{{firstName}}\",\r\n  \"lastName\": \"{{lastName}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/users/auth/sign-up"
+					},
+					"response": []
+				},
+				{
+					"name": "Sign In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('response status code should have 200 values', () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"pm.test('response Content-Type header should have application/json value', () => {\r",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.equals('application/json; charset=utf-8')\r",
+									"})\r",
+									"\r",
+									"pm.test('response body should an object', () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"    pm.expect(responseJson).to.be.an('object')\r",
+									"})\r",
+									"\r",
+									"pm.test('response body object should contain correct property and value', () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('status')\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('message')\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('data')\r",
+									"\r",
+									"    pm.expect(responseJson.status).to.equals(\"success\")\r",
+									"    pm.expect(responseJson.message).to.equals('Login successfully')\r",
+									"    pm.expect(responseJson.data).to.be.an(\"object\")\r",
+									"})\r",
+									"\r",
+									"pm.test(\"response body data object should contain `accessToken` string\", () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"    const { data } = responseJson\r",
+									"\r",
+									"    pm.expect(data).to.haveOwnProperty(\"accessToken\")\r",
+									"    pm.expect(data.accessToken).to.be.an('string')\r",
+									"\r",
+									"    pm.environment.set('accessToken', data.accessToken)\r",
+									"    \r",
+									"    const tokenParts = data.accessToken.split('.')\r",
+									"    const encodedPayload = tokenParts[1]\r",
+									"    const decodedPayload = Buffer.from(encodedPayload, 'base64').toString('utf-8')\r",
+									"    const payload = JSON.parse(decodedPayload)\r",
+									"    pm.environment.set('expiredAccessToken', payload.exp)\r",
+									"    \r",
+									"    pm.environment.set('refreshToken', pm.cookies.get('refreshToken'))\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"fcmToken\": \"{{fcmToken}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/users/auth/sign-in"
+					},
+					"response": []
+				},
+				{
+					"name": "Sign Out",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/users/auth/sign-out"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{refreshToken}}",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/users/auth/sign-out"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "set-cookie",
+									"value": "refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"35-4BjSUm/T6iGSBrbqBPL4YS+OU+A\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "2e8b148092442a109c1b034e2221e5d1;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:21:13 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "53"
+								},
+								{
+									"key": "Expires",
+									"value": "Sat, 14 Dec 2024 03:21:13 GMT"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "private"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Success signout user\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('response status code should have 200 values', () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"pm.test('response Content-Type header should have application/json value', () => {\r",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.equals('application/json; charset=utf-8')\r",
+									"})\r",
+									"\r",
+									"pm.test('response body should an object', () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"    pm.expect(responseJson).to.be.an('object')\r",
+									"})\r",
+									"\r",
+									"pm.test('response body object should contain correct property and value', () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('status')\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('message')\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('data')\r",
+									"\r",
+									"    pm.expect(responseJson.status).to.equals(\"success\")\r",
+									"    pm.expect(responseJson.message).to.equals('Refresh token successfully')\r",
+									"    pm.expect(responseJson.data).to.be.an(\"object\")\r",
+									"})\r",
+									"\r",
+									"pm.test(\"response body data object should contain `accessToken` string\", () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"    const { data } = responseJson\r",
+									"\r",
+									"    pm.expect(data).to.haveOwnProperty(\"accessToken\")\r",
+									"    pm.expect(data.accessToken).to.be.an('string')\r",
+									"\r",
+									"    pm.environment.set('accessToken', data.accessToken)\r",
+									"    \r",
+									"    const tokenParts = data.accessToken.split('.')\r",
+									"    const encodedPayload = tokenParts[1]\r",
+									"    const decodedPayload = Buffer.from(encodedPayload, 'base64').toString('utf-8')\r",
+									"    const payload = JSON.parse(decodedPayload)\r",
+									"    pm.environment.set('expiredAccessToken', payload.exp)\r",
+									"    \r",
+									"    pm.environment.set('refreshToken', pm.cookies.get('refreshToken'))\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/users/auth/refresh-token"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/users/auth/delete-account"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update User",
+			"item": [
+				{
+					"name": "Get all users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/users/profile/all?limit=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"profile",
+								"all"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/v1/users/profile/all?limit=1",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"users",
+										"profile",
+										"all"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"193-g099cFU8hHyhojVtB1OufqN0hrI\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "188d2c89420d225e76e87ed4d5d220a4;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:48:16 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "403"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"users retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": \"h0rzxa9yyWgrDc2ELI4NkSOYE562\",\n            \"firstName\": \"Aldi\",\n            \"lastName\": \"Musneldi\",\n            \"email\": \"aldimusneldi@pintar.com\",\n            \"username\": \"aldimusneldi9735\",\n            \"description\": \"\",\n            \"fullName\": \"\",\n            \"profilePic\": \"\",\n            \"balance\": 0,\n            \"isOnline\": false,\n            \"createdAt\": \"2024-12-14T03:08:47.118Z\",\n            \"updatedAt\": \"2024-12-14T03:08:47.118Z\",\n            \"refreshToken\": null,\n            \"fcmToken\": null\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Get user by token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/users/profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Update user by token [masukin semua field agar tidak hilang field lain]",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"balance\": 200,\r\n  \"accountStatus\": \"Incomplete\",\r\n  \"country\": \"\",\r\n  \"email\": \"\",\r\n  \"profilePic\": \"\",\r\n  \"shortDescription\": \"\",\r\n  \"subjects\": [],\r\n  \"username\": \"\",\r\n  \"followers\": 0,\r\n  \"videos\": [],\r\n  \"languages\": [],\r\n  \"nCourses\": 0,\r\n  \"nVideos\": 0,\r\n  \"isOnline\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/users/profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Partially update user by token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"balance\": 100\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/users/profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user by token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/users/profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fileName\": \"profile-pic.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/users/profile/file/profile-pic/upload-url"
+					},
+					"response": []
+				},
+				{
+					"name": "Save upload profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fileName\": \"profile-pic.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/users/profile/file/profile-pic/save-url"
+					},
+					"response": []
+				},
+				{
+					"name": "Update password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"currentPassword\": \"{{password}}\",\r\n  \"newPassword\": \"12345678\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/users/profile/password/change"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Session",
+			"item": [
+				{
+					"name": "Session Start - With Tutor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"lawyerID\": \"ylsflD55ZLagVZERZOpmvsil9FC2\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/sessions/start"
+					},
+					"response": []
+				},
+				{
+					"name": "Session Start - Random Tutors",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImdqdmFGaGVlcHVVZllBb3VJZG13QTBrZkFDWDIiLCJmaXJzdE5hbWUiOiJoZWxsb1dvcmxkIiwiZW1haWwiOiJjdXJsQGdtYWlsLmNvbSIsInJvbGUiOiJzdHVkZW50IiwiaWF0IjoxNzMxMDcyMDI2LCJleHAiOjE3MzExNTg0MjZ9.ASUul3FNvzpGMeGHBZpBLWIu-d07pWlJOcjN7DacsMs"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"question\": \"What is algebra?\",\r\n  \"studentCountry\": \"Indonesia\",\r\n  \"languages\": [\"English\"],\r\n  \"subjects\": [\"Mathematics\"],\r\n  \"topics\": [\"Algebra\",\"Math\"],\r\n  \"age\": 15,\r\n  \"searchID\": \"\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/sessions/start/tutor-random"
+					},
+					"response": []
+				},
+				{
+					"name": "Start - No",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"searchID\": \"FaQOxDUHqWoEPnHlyBeS\",\r\n  \"tutorID\": \"fh0S7OHdBZYkbtyjaaT1d5LKfev2\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/sessions/start/no"
+					},
+					"response": []
+				},
+				{
+					"name": "Start - Yes",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"searchID\": \"1YLrg2M8xJNaEV2btiFd\",\r\n  \"tutorID\": \"fh0S7OHdBZYkbtyjaaT1d5LKfev2\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/sessions/start/yes"
+					},
+					"response": []
+				},
+				{
+					"name": "Session End",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"sessionID\": \"qQZ1ElsfMgk3PkUNmchC\",\r\n  \"tutorID\": \"SYv9nYsL9hWCKI8Md9lJgtqTvO82\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseLocalUrl}}/v1/sessions/end"
+					},
+					"response": []
+				},
+				{
+					"name": "Leave Meeting",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"sessionID\": \"qQZ1ElsfMgk3PkUNmchC\",\r\n  \"role\": \"tutor\",\r\n  \"reason\": \"Internet connectivity issue\",\r\n  \"type\": \"student_internet_disconnect\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/sessions/leave"
+					},
+					"response": []
+				},
+				{
+					"name": "Rejoin Meeting",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"sessionID\": \"qQZ1ElsfMgk3PkUNmchC\",\r\n  \"type\": \"tutor\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseLocalUrl}}/v1/sessions/rejoin"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload file",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"files\": [\"example1.png\", \"example2.pdf\", \"example3.jpg\"],\r\n  \"sessionID\" : \"qQZ1ElsfMgk3PkUNmchC\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/sessions/upload-urls"
+					},
+					"response": []
+				},
+				{
+					"name": "Save upload file",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fileUrls\": [\"example1.png\", \"example2.pdf\", \"example3.jpg\"],\r\n  \"sessionID\" : \"qQZ1ElsfMgk3PkUNmchC\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/sessions/save-file-urls"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "History & Summary Session",
+			"item": [
+				{
+					"name": "History - month & year",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/sessions/session-history/huHeJPhKfAaD9PQeNajJ4o8JF773?year=2024&month=10&pageSize=10&lastSessionID=o7tn8WMKPAFNdYwc06DC",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"sessions",
+								"session-history",
+								"huHeJPhKfAaD9PQeNajJ4o8JF773"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								},
+								{
+									"key": "month",
+									"value": "10"
+								},
+								{
+									"key": "pageSize",
+									"value": "10",
+									"description": "(opsional, default 10)"
+								},
+								{
+									"key": "lastSessionID",
+									"value": "o7tn8WMKPAFNdYwc06DC",
+									"description": "(opsional)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "History - year",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/sessions/session-history/fh0S7OHdBZYkbtyjaaT1d5LKfev2?year=2024",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"sessions",
+								"session-history",
+								"fh0S7OHdBZYkbtyjaaT1d5LKfev2"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Statistics Tutor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/sessions/statistics/huHeJPhKfAaD9PQeNajJ4o8JF773"
+					},
+					"response": []
+				},
+				{
+					"name": "Summary Tutor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/sessions/summary/huHeJPhKfAaD9PQeNajJ4o8JF773?year=2023",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"sessions",
+								"summary",
+								"huHeJPhKfAaD9PQeNajJ4o8JF773"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2023"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update Session",
+			"item": [
+				{
+					"name": "Get session by ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/sessions/info/C9zxun72pm6RFgaEZ6iS"
+					},
+					"response": []
+				},
+				{
+					"name": "Update session by ID [!]",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"channelName\": \"session_4BbHe1yXWbTqun9V8kZl6RB5gfq1_FQ6gon6bOdMe94Ads3lf7fEBtvo1\",\r\n  \"tutorID\": \"FQ6gon6bOdMe94Ads3lf7fEBtvo1\",\r\n  \"studentID\": \"4BbHe1yXWbTqun9V8kZl6RB5gfq1\",\r\n  \"sessionID\": \"0OxuwD3Uc4MqdUnqyPOs\",\r\n  \"status\": \"Completed\",\r\n  \"startTime\": \"2023-09-25T08:00:00.000Z\",\r\n  \"endTime\": \"2023-09-25T09:00:00.000Z\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/sessions/info/{{sessionID}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Partially update session by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"status\": \"In Progress\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/sessions/info/qQZ1ElsfMgk3PkUNmchC"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete session by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/sessions/info/{{sessionID}}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth Lawyer",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"firstName\": \"{{firstName}}\",\r\n  \"lastName\": \"{{lastName}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/lawyers/auth/sign-up"
+					},
+					"response": [
+						{
+							"name": "Already",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"firstName\": \"{{firstName}}\",\r\n  \"lastName\": \"{{lastName}}\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/lawyers/auth/sign-up"
+							},
+							"status": "Conflict",
+							"code": 409,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"55-eLqzgPSr6bcrDqSoET7Roo6REYE\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "bb16339a92e7dd6b7089cbd950ebb991;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:22:36 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "85"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"fail\",\n    \"message\": \"The email address is already in use by another account.\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Sign In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('response status code should have 200 values', () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"pm.test('response Content-Type header should have application/json value', () => {\r",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.equals('application/json; charset=utf-8')\r",
+									"})\r",
+									"\r",
+									"pm.test('response body should an object', () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"    pm.expect(responseJson).to.be.an('object')\r",
+									"})\r",
+									"\r",
+									"pm.test('response body object should contain correct property and value', () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('status')\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('message')\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('data')\r",
+									"\r",
+									"    pm.expect(responseJson.status).to.equals(\"success\")\r",
+									"    pm.expect(responseJson.message).to.equals('Login successfully')\r",
+									"    pm.expect(responseJson.data).to.be.an(\"object\")\r",
+									"})\r",
+									"\r",
+									"pm.test(\"response body data object should contain `accessToken` string\", () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"    const { data } = responseJson\r",
+									"\r",
+									"    pm.expect(data).to.haveOwnProperty(\"accessToken\")\r",
+									"    pm.expect(data.accessToken).to.be.an('string')\r",
+									"\r",
+									"    pm.environment.set('accessToken', data.accessToken)\r",
+									"    \r",
+									"    const tokenParts = data.accessToken.split('.')\r",
+									"    const encodedPayload = tokenParts[1]\r",
+									"    const decodedPayload = Buffer.from(encodedPayload, 'base64').toString('utf-8')\r",
+									"    const payload = JSON.parse(decodedPayload)\r",
+									"    pm.environment.set('expiredAccessToken', payload.exp)\r",
+									"    \r",
+									"    pm.environment.set('refreshToken', pm.cookies.get('refreshToken'))\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\",\r\n  \"fcmToken\": \"{{fcmToken}}\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/lawyers/auth/sign-in"
+					},
+					"response": []
+				},
+				{
+					"name": "Sign Out",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{refreshToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/lawyers/auth/sign-out"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{refreshToken}}",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/lawyers/auth/sign-out"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "set-cookie",
+									"value": "refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"35-4BjSUm/T6iGSBrbqBPL4YS+OU+A\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "2e8b148092442a109c1b034e2221e5d1;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:21:13 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "53"
+								},
+								{
+									"key": "Expires",
+									"value": "Sat, 14 Dec 2024 03:21:13 GMT"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "private"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Success signout user\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('response status code should have 200 values', () => {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})\r",
+									"\r",
+									"pm.test('response Content-Type header should have application/json value', () => {\r",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.equals('application/json; charset=utf-8')\r",
+									"})\r",
+									"\r",
+									"pm.test('response body should an object', () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"    pm.expect(responseJson).to.be.an('object')\r",
+									"})\r",
+									"\r",
+									"pm.test('response body object should contain correct property and value', () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('status')\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('message')\r",
+									"    pm.expect(responseJson).to.haveOwnProperty('data')\r",
+									"\r",
+									"    pm.expect(responseJson.status).to.equals(\"success\")\r",
+									"    pm.expect(responseJson.message).to.equals('Refresh token successfully')\r",
+									"    pm.expect(responseJson.data).to.be.an(\"object\")\r",
+									"})\r",
+									"\r",
+									"pm.test(\"response body data object should contain `accessToken` string\", () => {\r",
+									"    const responseJson = pm.response.json()\r",
+									"    const { data } = responseJson\r",
+									"\r",
+									"    pm.expect(data).to.haveOwnProperty(\"accessToken\")\r",
+									"    pm.expect(data.accessToken).to.be.an('string')\r",
+									"\r",
+									"    pm.environment.set('accessToken', data.accessToken)\r",
+									"    \r",
+									"    const tokenParts = data.accessToken.split('.')\r",
+									"    const encodedPayload = tokenParts[1]\r",
+									"    const decodedPayload = Buffer.from(encodedPayload, 'base64').toString('utf-8')\r",
+									"    const payload = JSON.parse(decodedPayload)\r",
+									"    pm.environment.set('expiredAccessToken', payload.exp)\r",
+									"    \r",
+									"    pm.environment.set('refreshToken', pm.cookies.get('refreshToken'))\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/lawyers/auth/refresh-token"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/lawyers/auth/delete-account"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Update Lawyer",
+			"item": [
+				{
+					"name": "Get all lawyer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/v1/users/profile/lawyer/all?limit=4",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"profile",
+								"lawyer",
+								"all"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all lawyer by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/users/profile/lawyer/asdasda"
+					},
+					"response": []
+				},
+				{
+					"name": "Get lawyer by token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/lawyers/profile"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": "{{baseUrl}}/v1/lawyers/profile"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"3fb-NsoFh9mdraPHiZc8XssPwv80IkI\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "74bdd3ced7b903006d5460b7362af8e8"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 18:13:35 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1019"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"lawyer profile retrieved successfully\",\n    \"data\": {\n        \"firstName\": \"Dwi\",\n        \"lastName\": \"Andhara\",\n        \"email\": \"dwiandhara@pintar.com\",\n        \"username\": \"dwiandhara7759\",\n        \"fullName\": \"\",\n        \"balance\": 0,\n        \"isOnline\": false,\n        \"createdAt\": \"2024-12-14T17:47:30.965Z\",\n        \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiJ5bHNmbEQ1NVpMYWdWWkVSWk9wbXZzaWw5RkMyIiwiZW1haWwiOiJkd2lhbmRoYXJhQHBpbnRhci5jb20iLCJyb2xlIjoibGF3eWVyIiwiaWF0IjoxNzM0MTk4NDU1LCJleHAiOjE3MzY3OTA0NTV9.ziH85ys8otd23bM5wl_yS8n0gij1vx5gSWMAPDKE2ws\",\n        \"fcmToken\": \"bd65701fe65fc74e2f9864074c33e95b82e09e588ee2060baafb92f776df0edaf764cedd9b646964449a8bebc2a00a43d23ae7382b0a05bc9bd1bdc554f1de4127ad0fdadd710ffd20af27f061e0237400bfd3f1c6758625edac319e55ef7df316adf40a5b80927caf940eb7335fc19427ea5123b998446413f4cad1cf414cc241b197ba55208af684faa28a\",\n        \"profilePic\": \"https://storage.googleapis.com/studyotutorapp.appspot.com/testing/ylsflD55ZLagVZERZOpmvsil9FC2/profile-pic.jpg\",\n        \"description\": \"pengacara yang jujur\",\n        \"updatedAt\": \"2024-12-14T17:49:46.727Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update lawyer by token [masukin semua field agar tidak hilang field lain]",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"balance\": 200,\r\n  \"accountStatus\": \"Incomplete\",\r\n  \"country\": \"\",\r\n  \"email\": \"\",\r\n  \"profilePic\": \"\",\r\n  \"shortDescription\": \"\",\r\n  \"subjects\": [],\r\n  \"username\": \"\",\r\n  \"followers\": 0,\r\n  \"videos\": [],\r\n  \"languages\": [],\r\n  \"nCourses\": 0,\r\n  \"nVideos\": 0,\r\n  \"isOnline\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/lawyers/profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Partially update lawyer by token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"description\": \"pengacara yang jujur\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/lawyers/profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete lawyer by token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/lawyers/profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fileName\": \"profile-pic.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/lawyers/profile/file/profile-pic/upload-url"
+					},
+					"response": []
+				},
+				{
+					"name": "Save upload profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"fileName\": \"profile-pic.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/lawyers/profile/file/profile-pic/save-url"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Communitas",
+			"item": [
+				{
+					"name": "Get all post",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/communitas/"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/communitas/"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"4bb-Gyb3URrri0YI4TUl9Q0vbO5ueqM\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "9b2f09ec0b66ac37f8d7050218bffbce;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 14:48:34 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1211"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Community posts fetched successfully.\",\n    \"data\": [\n        {\n            \"id\": \"JHTygYr5NTRPuW0ON65U\",\n            \"title\": \"How to solve a legal issue?\",\n            \"question\": \"I need advice on handling a contract dispute.\",\n            \"creatorID\": \"OpPBvk1ZVpT06pqgbwCHT1uCiIk2\",\n            \"createdAt\": \"2024-12-14T14:38:46.564Z\",\n            \"updatedAt\": \"2024-12-14T14:38:46.564Z\",\n            \"firstname\": null,\n            \"totalComments\": 0\n        },\n        {\n            \"id\": \"zYzyk5nfGR6N1ipaeCgs\",\n            \"title\": \"How to solve a legal issue?\",\n            \"question\": \"I need advice on handling a contract dispute.\",\n            \"creatorID\": \"OpPBvk1ZVpT06pqgbwCHT1uCiIk2\",\n            \"createdAt\": \"2024-12-14T14:38:40.522Z\",\n            \"updatedAt\": \"2024-12-14T14:38:40.522Z\",\n            \"firstname\": null,\n            \"totalComments\": 1\n        },\n        {\n            \"id\": \"4h0QOKdnIl8TKyEb2gFo\",\n            \"title\": \"How to solve a legal issue?\",\n            \"question\": \"I need advice on handling a contract dispute.\",\n            \"creatorID\": \"h0rzxa9yyWgrDc2ELI4NkSOYE562\",\n            \"createdAt\": \"2024-12-14T03:28:17.201Z\",\n            \"updatedAt\": \"2024-12-14T03:28:17.201Z\",\n            \"firstname\": null,\n            \"totalComments\": 0\n        },\n        {\n            \"id\": \"UV7NnsDDWoyfuC8uO19R\",\n            \"title\": \"How to solve a legal issue?\",\n            \"question\": \"I need advice on handling a contract dispute.\",\n            \"creatorID\": \"h0rzxa9yyWgrDc2ELI4NkSOYE562\",\n            \"createdAt\": \"2024-12-14T03:27:47.644Z\",\n            \"updatedAt\": \"2024-12-14T03:27:47.644Z\",\n            \"firstname\": null,\n            \"totalComments\": 1\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Create post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"How to solve a legal issue?\",\r\n  \"question\": \"I need advice on handling a contract dispute.\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/communitas/"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"How to solve a legal issue?\",\r\n  \"question\": \"I need advice on handling a contract dispute.\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/communitas/"
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"114-TLqLdeKCL+rHvFOgirVh2wGLNb8\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "b412c6d62d7ff594b565346f26e6b140;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:27:47 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "276"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Community post created successfully.\",\n    \"data\": {\n        \"id\": \"UV7NnsDDWoyfuC8uO19R\",\n        \"title\": \"How to solve a legal issue?\",\n        \"question\": \"I need advice on handling a contract dispute.\",\n        \"creatorID\": \"h0rzxa9yyWgrDc2ELI4NkSOYE562\",\n        \"createdAt\": {},\n        \"updatedAt\": {}\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get all comment by post",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/communitas/UV7NnsDDWoyfuC8uO19R/comments"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/communitas/UV7NnsDDWoyfuC8uO19R/comments"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"114-YdoDnu4fspZXVn13ONLqhPHAoPU\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "b2a21b89dfb033e60ff334283a60e16d;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:33:02 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "276"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Comments fetched successfully.\",\n    \"data\": [\n        {\n            \"id\": \"s7XLMygmfKWtA3iWGLjR\",\n            \"comment\": \"Hi, I need help with my case.\",\n            \"commenterID\": \"h0rzxa9yyWgrDc2ELI4NkSOYE562\",\n            \"createdAt\": \"2024-12-14T03:31:55.560Z\",\n            \"username\": \"aldimusneldi9735\",\n            \"profilePic\": null\n        }\n    ]\n}"
+						},
+						{
+							"name": "fail",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/communitas/UV7NnsDDWoyfuC8uO19R/comments"
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"3e-xcnKAxfx2N6GmSLiEo/03A9xRjQ\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "333b2807c09a078c1dcd21b724bb2272;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:29:39 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"fail\",\n    \"message\": \"No comments found for this post.\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create comment by post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"comment\": \"Hi, I need help with my case.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/communitas/UV7NnsDDWoyfuC8uO19R/comment"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"comment\": \"Hi, I need help with my case.\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/communitas/UV7NnsDDWoyfuC8uO19R/comment"
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"c7-Wkge71G7uVIM6JTkF5VkkbSDaOA\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "d236cac69239893fd375b8c99b71f761;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:31:55 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "199"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Comment added successfully.\",\n    \"data\": {\n        \"id\": \"s7XLMygmfKWtA3iWGLjR\",\n        \"comment\": \"Hi, I need help with my case.\",\n        \"commenterID\": \"h0rzxa9yyWgrDc2ELI4NkSOYE562\",\n        \"createdAt\": {}\n    }\n}"
+						},
+						{
+							"name": "fail",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"senderID\": \"user123\",\r\n  \"receiverID\": \"lawyer456\",\r\n  \"comment\": \"Hi, I need help with my case.\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/communitas/UV7NnsDDWoyfuC8uO19R/comment"
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"44-kjb/Ii3zpM5GcN7/agxZJ8moa5c\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "2dc468a124dadfe7265a36d0d9a98871;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:30:58 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "68"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"fail\",\n    \"message\": \"Both post ID and comment are required.\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Chat with Lawyer",
+			"item": [
+				{
+					"name": "Get chat by room",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/chat/chatRoom123/messages"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/chat/chatRoom123/messages"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"273-p4RtPn2mFaQ653mMSD/4KpNmS6M\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "a71390bfdd137b14b9f209f1e8672e07;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:42:04 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "627"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Messages fetched successfully.\",\n    \"data\": [\n        {\n            \"id\": \"da06SMT8NQInaLEtl5uk\",\n            \"senderID\": \"userID123\",\n            \"receiverID\": \"lawyerID456\",\n            \"message\": \"Hi, I need help with my case.\",\n            \"createdAt\": \"2024-12-14T03:39:17.396Z\",\n            \"sender\": {\n                \"id\": \"userID123\",\n                \"username\": null,\n                \"profilePic\": null\n            },\n            \"receiver\": {\n                \"id\": \"lawyerID456\",\n                \"username\": null,\n                \"profilePic\": null\n            }\n        },\n        {\n            \"id\": \"LLd8AnO73AqJf4RKx98w\",\n            \"senderID\": \"userID123\",\n            \"receiverID\": \"lawyerID456\",\n            \"message\": \"walawe\",\n            \"createdAt\": \"2024-12-14T03:41:53.067Z\",\n            \"sender\": {\n                \"id\": \"userID123\",\n                \"username\": null,\n                \"profilePic\": null\n            },\n            \"receiver\": {\n                \"id\": \"lawyerID456\",\n                \"username\": null,\n                \"profilePic\": null\n            }\n        }\n    ]\n}"
+						},
+						{
+							"name": "Not found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/chat/da06SMT8NQInaLEtl5uk/messages"
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"42-zZgwOB8QGi2C6feGmelrDuuDmjw\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "a35b312a73c19f59360063e525266a93;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:39:53 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "66"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"fail\",\n    \"message\": \"No messages found in this chat room.\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create chat",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"chatRoomId\": \"chatRoom123\",\r\n  \"senderID\": \"vc56DDEENZTAbsiRbM2sMO5tNN83\",\r\n  \"receiverID\": \"4a8060YPWbburtQKAwekTotLvUG2\",\r\n  \"message\": \"walawe\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/chat/message"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"chatRoomId\": \"chatRoom123\",\r\n  \"senderID\": \"userID123\",\r\n  \"receiverID\": \"lawyerID456\",\r\n  \"message\": \"Hi, I need help with my case.\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/chat/message"
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"cb-794j4PDgfxwq4XMVjCtCWgsEI48\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "ba62423ac0e8ca92ee4ff915773f093c;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:39:17 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "203"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Message sent successfully.\",\n    \"data\": {\n        \"id\": \"da06SMT8NQInaLEtl5uk\",\n        \"senderID\": \"userID123\",\n        \"receiverID\": \"lawyerID456\",\n        \"message\": \"Hi, I need help with my case.\",\n        \"createdAt\": {}\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get chat by userID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/chat/userID123/chat-rooms"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/chat/userID123/chat-rooms"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"e2-WaGganP5v3QjLHzgBjRkUpq+Uf0\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "30a6b24789266d371abc15d5da662af3;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:56:07 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "226"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Chat rooms fetched successfully.\",\n    \"data\": [\n        {\n            \"id\": \"chatRoom123\",\n            \"participants\": [\n                \"userID123\",\n                \"lawyerID456\"\n            ],\n            \"lastMessageAt\": {\n                \"_seconds\": 1734147713,\n                \"_nanoseconds\": 500000000\n            },\n            \"lastMessage\": \"walawe\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Not found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/chat/h0rzxa9yyWgrDc2ELI4NkSOYE562/chat-rooms"
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"40-lRCd5ISmHuq8dXnSqJs/NfWgY9k\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "386434cff34ef96978e9db871d3ad6ae;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:55:43 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "64"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"fail\",\n    \"message\": \"No chat rooms found for this user.\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Chat with AI",
+			"item": [
+				{
+					"name": "Get chat AI",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/ai/ai-chats"
+					},
+					"response": [
+						{
+							"name": "Fail",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/ai/ai-chats"
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"3e-KXRZFJMMs3woIRLf82Jh2ocKB/s\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "6fc5d70aa50a4f46cd8b24b549b6282b;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:59:08 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"fail\",\n    \"message\": \"No AI chats found for this user.\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Create chat AI",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"message\": \"What is the capital of France?\",\r\n  \"chatRoomId\": \"V0QLsyyHpgqDhmQde5Dd\" \r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/ai/ai-chats"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"message\": \"What is the capital of France?\"\r\n//   \"chatRoomId\": \"optional-chat-room-id\" \r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/ai/ai-chats"
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"101-i0QxWk5VeCOYZQb659LVneoo8KE\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "c16c017427778e0b7e88d9fb6f6eaf13"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 04:00:21 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "257"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"New AI chat created.\",\n    \"data\": {\n        \"chatRoomId\": \"V0QLsyyHpgqDhmQde5Dd\",\n        \"title\": \"AI Chat: What is the capital of France?\",\n        \"userMessage\": \"What is the capital of France?\",\n        \"aiResponse\": \"AI Response to: What is the capital of France?\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get chat AI by ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/ai/ai-chats/asasa/messages"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/ai/ai-chats/V0QLsyyHpgqDhmQde5Dd/messages"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"15e-PVDUu+UDucmPUh7QA8OW6+fepsw\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "18f5616e093e17cb50f16fcf3722c142"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 04:06:32 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "350"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"message\": \"Fetched AI chat messages successfully.\",\n    \"data\": [\n        {\n            \"id\": \"rWcEdP0rUavoCPgvGldb\",\n            \"sender\": \"user\",\n            \"content\": \"What is the capital of France?\",\n            \"createdAt\": \"2024-12-14T04:00:20.979Z\"\n        },\n        {\n            \"id\": \"Age3DfEJQYJpqmbau0Nc\",\n            \"sender\": \"ai\",\n            \"content\": \"AI Response to: What is the capital of France?\",\n            \"createdAt\": \"2024-12-14T04:00:21.155Z\"\n        }\n    ]\n}"
+						},
+						{
+							"name": "Fail",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/ai/ai-chats"
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "x-powered-by",
+									"value": "Express"
+								},
+								{
+									"key": "vary",
+									"value": "Origin"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "etag",
+									"value": "W/\"3e-KXRZFJMMs3woIRLf82Jh2ocKB/s\""
+								},
+								{
+									"key": "X-Cloud-Trace-Context",
+									"value": "6fc5d70aa50a4f46cd8b24b549b6282b;o=1"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 03:59:08 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Google Frontend"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								},
+								{
+									"key": "Alt-Svc",
+									"value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"fail\",\n    \"message\": \"No AI chats found for this user.\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Chat with AI",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refreshToken}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"prompt\": \"saya terkane razia, hukum apa yang dapat membantu saya\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "http://127.0.0.1:8080/generate"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"prompt\": \"saya terkane razia, hukum apa yang dapat membantu saya\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "http://127.0.0.1:8080/generate"
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.4"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 14 Dec 2024 06:59:22 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "653"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"response\": \"Pertanyaan Anda terkait dengan hukum!\\n\\nDalam kasus razia, Anda dapat mengacu pada Pasal 15 yang berbunyi: \\\"Setiap orang yang ditangkap harus segera diberitahukan alasan penangkapannya.\\\"\\n\\nArtinya, jika Anda ditangkap atau razia, Anda berhak mengetahui alasan penangkapan tersebut dan harus segera diberitahukan oleh pihak yang melakukan penangkapan.\\n\\nSelain itu, Anda juga dapat mengacu pada Pasal 1 yang berbunyi: \\\"Setiap orang berhak atas perlindungan hukum dan rasa aman.\\\"\\n\\nDalam hal ini, Anda berhak atas perlindungan hukum dan rasa aman, sehingga Anda dapat meminta bantuan hukum jika merasa hak-hak Anda telah dilanggar.\"\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}
